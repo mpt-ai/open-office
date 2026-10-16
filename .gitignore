@@ -26,6 +26,11 @@ Thumbs.db
 *.swp
 *~
 
+# ---- media: keep rendered GIFs, not raw screen recordings ----
+asset/*.mp4
+asset/*.mov
+asset/*.webm
+
 # ---- secrets ----
 .env
 .env.*

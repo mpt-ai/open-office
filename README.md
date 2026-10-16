@@ -5,6 +5,11 @@ agents and sub-agents work. One root session is a desk pod in an open-plan floor
 open a pod and every agent/sub-agent session becomes a person at the table with a
 speech bubble, a whiteboard of what is in flight, and a couch for the idle ones.
 
+![Agent Office demo](asset/demo.gif)
+
+*Open-plan floor of live sessions, then one meeting room as its agents walk in,
+take seats, and report what they're doing.*
+
 Zero dependencies. One Node file, three static files.
 
 ## Requirements
@@ -79,3 +84,18 @@ walk speed — live in the `SIM` section of `web/app.js`.
 - Full redraw per poll — no deltas yet (that's the WebSocket TODO).
 
 Local toy: it reads your own session history on `127.0.0.1` and nothing else.
+
+## Demo GIF
+
+The GIF above is the only committed recording; raw `.mp4` screen captures in
+`asset/` are gitignored. To re-render it after changing the UI:
+
+```bash
+ffmpeg -ss 0 -t 49 -i recording.mp4 -an \
+  -vf "crop=1240:614:24:106,fps=10,scale=640:-1:flags=lanczos,\
+split[s0][s1];[s0]palettegen=max_colors=128:stats_mode=diff[p];[s1][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle" \
+  asset/demo.gif
+```
+
+The crop drops the browser/desktop chrome, `fps=10` keeps it near 1.4 MB, and the
+palette pass keeps the speech-bubble text legible.
