@@ -7,8 +7,8 @@ speech bubble, a whiteboard of what is in flight, and a couch for the idle ones.
 
 ![Agent Office demo](asset/demo.gif)
 
-*Open-plan floor of live sessions, then one meeting room as its agents walk in,
-take seats, and report what they're doing.*
+*One meeting room: agents walk in through the door, take seats, and report what
+they're doing on the whiteboard.*
 
 Zero dependencies. One Node file, three static files.
 
@@ -91,11 +91,12 @@ The GIF above is the only committed recording; raw `.mp4` screen captures in
 `asset/` are gitignored. To re-render it after changing the UI:
 
 ```bash
-ffmpeg -ss 0 -t 49 -i recording.mp4 -an \
+ffmpeg -ss 32 -t 17 -i recording.mp4 -an \
   -vf "crop=1240:614:24:106,fps=10,scale=640:-1:flags=lanczos,\
 split[s0][s1];[s0]palettegen=max_colors=128:stats_mode=diff[p];[s1][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle" \
   asset/demo.gif
 ```
 
-The crop drops the browser/desktop chrome, `fps=10` keeps it near 1.4 MB, and the
-palette pass keeps the speech-bubble text legible.
+The clip keeps the liviest 17 s of the recording (agents arriving and seating).
+The crop drops the browser/desktop chrome, `fps=10` keeps walking smooth at
+~700 KB, and the palette pass keeps the speech-bubble text legible.
