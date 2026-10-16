@@ -1,0 +1,33 @@
+# ---- node ----
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+
+# ---- runtime / local state ----
+*.log
+logs/
+.tmp/
+cache/
+*.sqlite
+*.sqlite3
+*.db
+*.db-wal
+*.db-shm
+opencode.db*
+
+# ---- editor / os ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
+
+# ---- secrets ----
+.env
+.env.*
+!.env.example
+auth.json

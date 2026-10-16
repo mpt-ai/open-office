@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Agent Office — who is doing what</title>
+<link rel="stylesheet" href="/style.css" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='22' r='13' fill='%23ffd9b0' stroke='%232b2b2b' stroke-width='3'/><path d='M21 62v-9a11 11 0 0 1 22 0v9z' fill='%234a8fd6' stroke='%232b2b2b' stroke-width='3'/></svg>" />
+</head>
+<body>
+<header>
+  <div class="brand">
+    <svg viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">
+      <circle cx="32" cy="22" r="13" fill="#ffd9b0" stroke="#2b2b2b" stroke-width="3"/>
+      <circle cx="27" cy="21" r="1.8" fill="#2b2b2b"/><circle cx="37" cy="21" r="1.8" fill="#2b2b2b"/>
+      <path d="M27 27q5 4 10 0" stroke="#2b2b2b" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M21 62v-9a11 11 0 0 1 22 0v9z" fill="#4a8fd6" stroke="#2b2b2b" stroke-width="3"/>
+    </svg>
+    <h1>Agent Office</h1>
+    <span class="sub">one session = one meeting room · watch the agents work</span>
+  </div>
+  <div class="clock" id="clock"></div>
+</header>
+
+<main>
+  <!-- THE OFFICE (home) : one open-plan virtual room, every session a desk pod -->
+  <section id="floorView">
+    <div class="live-strip" id="liveStrip"></div>
+    <div class="co-stage" id="floorStage"><!-- building interior rendered by app.js --></div>
+  </section>
+
+  <!-- MEETING ROOM -->
+  <section id="roomView" hidden>
+    <div class="room-top">
+      <a class="back" href="#/">← office floor</a>
+      <h2 id="roomTitle"></h2>
+      <div class="room-meta" id="roomMeta"></div>
+      <span class="speed" id="speedBtns">walk speed:
+        <button data-s="0.5">slow</button><button data-s="1" class="on">1×</button><button data-s="2">2×</button><button data-s="3">3×</button>
+      </span>
+    </div>
+
+    <div class="whiteboard">
+      <div class="wb-half">
+        <h3>📋 the brief — who owns what</h3>
+        <div class="wb-body" id="boardTodos"></div>
+      </div>
+      <div class="wb-half">
+        <h3>🖊 doing right now</h3>
+        <div class="wb-body" id="boardFeed"></div>
+      </div>
+    </div>
+
+    <div class="legend" id="legendBar"></div>
+
+    <div class="meeting">
+      <div class="stage" id="stage"><!-- props + actors injected by app.js --></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span id="viewNote">reading opencode.db…</span>
+  <span class="peek" id="peek"></span>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>

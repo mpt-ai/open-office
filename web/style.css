@@ -1,0 +1,254 @@
+/* Agent Office — cartoon office: floor plan + animated virtual office stage */
+:root {
+  --ink: #2b2b2b; --paper: #f7f3ea; --floor: #efe6d4; --wall: #e7dcc6;
+  --board: #f4faf4; --accent: #4a8fd6; --busy: #f5a623; --ok: #5cb85c; --card: #fffdf8;
+  font-size: 15px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body { background: var(--paper); color: var(--ink); font: 15px/1.45 ui-rounded, "Segoe UI", system-ui, sans-serif; }
+a { color: inherit; }
+header { display: flex; align-items: center; justify-content: space-between; padding: 10px 18px;
+  border-bottom: 3px solid var(--ink); background: var(--card); position: sticky; top: 0; z-index: 5; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand h1 { font-size: 1.15rem; margin: 0; letter-spacing: .5px; }
+.brand .sub { color: #7a7264; font-size: .8rem; }
+.clock { font-variant-numeric: tabular-nums; color: #7a7264; }
+main { padding: 14px 18px 30px; max-width: 1280px; margin: 0 auto; }
+footer { display: flex; justify-content: space-between; gap: 20px; padding: 10px 18px; color: #8a8171; font-size: .8rem; }
+.peek { max-width: 50%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ================= live strip + floor ================= */
+.live-strip { display: flex; gap: 8px; overflow-x: auto; padding: 6px 2px 12px; scrollbar-width: thin; }
+.live-chip { flex: 0 0 auto; background: var(--card); border: 2px solid var(--ink); border-radius: 10px;
+  padding: 6px 10px; font-size: .78rem; cursor: pointer; box-shadow: 3px 3px 0 rgba(43,43,43,.15); max-width: 270px; }
+.live-chip b { font-size: .82rem; }
+.live-chip .who { display: block; color: #7a7264; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.live-chip.busy { border-color: var(--busy); box-shadow: 3px 3px 0 rgba(245,166,35,.35); }
+.live-strip .none { color: #9a917f; font-size: .82rem; padding: 6px; }
+/* ================= home = one open-plan virtual office ================== */
+@keyframes pulse { 50% { box-shadow: 0 0 0 5px rgba(92,184,92,.25); } }
+.spin-text::after { content: ""; animation: dots 1.8s steps(4, end) infinite; }
+@keyframes dots { 0%{content:""} 25%{content:"."} 50%{content:".."} 75%{content:"..."} }
+.co-stage { position: relative; min-height: 560px; overflow: hidden; user-select: none;
+  border: 3px solid var(--ink); border-radius: 16px;
+  background:
+    linear-gradient(180deg, #e3d7bd 0 118px, #efe6d4 118px),
+    repeating-linear-gradient(90deg, transparent 0 78px, rgba(120,100,76,.08) 78px 80px);
+  background-size: 100% 100%, 80px calc(100% - 118px);
+  background-position: top, bottom; background-repeat: no-repeat, repeat-x; }
+.co-stage .door-frame { z-index: 160; }
+/* per-pod desk */
+.fl-tab { position: absolute; background: #c89b6d; border: 3px solid var(--ink); border-radius: 999px;
+  box-shadow: inset 0 0 0 6px #d9b289, 3px 4px 0 rgba(20,15,10,.15); z-index: 300; cursor: pointer;
+  transition: background .6s, opacity .8s, filter .8s; }
+.fl-tab::before { content: ""; position: absolute; left: 10%; right: 40%; top: 6px; height: 6px;
+  background: rgba(255,255,255,.35); border-radius: 8px; }
+.fl-tab.busy { background: #c89b6d; }
+.fl-tab.idle { background: #b9a98d; filter: saturate(.6); }
+.fl-tab.stale { opacity: .45; filter: saturate(.2); }
+.fl-tab.gone { opacity: 0; }
+.fl-sign { position: absolute; transform: translate(-50%,-100%); background: var(--card);
+  border: 2px solid var(--ink); border-radius: 8px; padding: 2px 9px 1px; font-size: .62rem; font-weight: 700;
+  color: #4c4433; cursor: pointer; white-space: nowrap; max-width: 240px; overflow: hidden;
+  text-overflow: ellipsis; z-index: 360; box-shadow: 2px 2px 0 rgba(43,43,43,.14); }
+.fl-sign.busy { border-color: var(--busy); }
+.fl-sign.stale { opacity: .4; filter: saturate(.2); }
+.fl-sign.gone { opacity: 0; transition: opacity .8s; }
+.fl-hit { position: absolute; width: 230px; height: 150px; transform: translate(-50%,-40%);
+  cursor: pointer; z-index: 355; }
+/* pour-over coffee station on the right wall (decoration with steam) */
+.fl-pour { position: absolute; right: 34px; top: 152px; font-size: 26px; z-index: 7; }
+.fl-pour .steam { position: absolute; left: 4px; top: -14px; font-size: 12px; color: #8a8171;
+  animation: steam 2.2s infinite; }
+/* actors on the shared floor reuse the room CSS */
+.actor.mini .tag, .actor.mini .subtag, .actor.mini .bub { display: none !important; }
+.actor.mini { transform-origin: 0 0; pointer-events: none; }
+.actor.mini .zz { color: #7a7264; font-size: 12px; right: 14px; }
+
+/* ================= room header ================= */
+.room-top { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 10px; }
+.room-top .back { text-decoration: none; font-weight: 600; border-bottom: 2px dotted #9a917f; }
+.room-top h2 { margin: 0; font-size: 1.15rem; }
+.room-meta { color: #8a8171; font-size: .8rem; }
+.speed { margin-left: auto; color: #8a8171; font-size: .74rem; display: inline-flex; align-items: center; gap: 4px; }
+.speed button { border: 2px solid var(--ink); background: var(--card); border-radius: 8px; font: inherit;
+  font-size: .72rem; padding: 1px 8px; cursor: pointer; }
+.speed button.on { background: var(--ink); color: var(--card); }
+
+.legend { display: flex; gap: 14px; flex-wrap: wrap; margin: 0 0 10px; font-size: .76rem; color: #7a7264; }
+.legend .item { display: inline-flex; align-items: center; gap: 5px; }
+
+/* HTML board (the wall board is on-stage too) */
+.whiteboard { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; background: var(--board);
+  border: 3px solid var(--ink); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; min-height: 130px;
+  background-image: radial-gradient(rgba(43,43,43,.045) 1px, transparent 1px); background-size: 18px 18px; }
+.whiteboard h3 { margin: 0 0 8px; font-size: .85rem; border-bottom: 2px dashed #b9c9b9; padding-bottom: 6px; }
+.wb-half:first-child { border-right: 2px dashed #b9c9b9; padding-right: 14px; }
+.wb-body { font-size: .8rem; max-height: 190px; overflow: auto; }
+.wb-empty { color: #97a297; font-style: italic; }
+.feed-item { padding: 3px 0; display: flex; gap: 8px; align-items: baseline; }
+.feed-item .role { flex: 0 0 auto; font-weight: 700; font-size: .68rem; color: #fff; border-radius: 6px; padding: 0 6px; }
+.feed-item .st-pending { background: #b0a891; } .feed-item .st-in_progress { background: var(--busy); }
+.feed-item .st-completed { background: var(--ok); }
+.feed-item .txt { font-family: ui-monospace, monospace; font-size: .72rem; color: #4c604c;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+
+/* ================================================================ STAGE
+   back wall: door(left) · brief board · clock · window · coffee corner
+   floor: oval table with seat ring · rest corner (couch+bench) · potted plant
+   actors are moved every rAF by app.js                            */
+.stage { position: relative; height: 560px; overflow: hidden; user-select: none;
+  border: 3px solid var(--ink); border-radius: 16px;
+  background:
+    linear-gradient(180deg, #e3d7bd 0 118px, #efe6d4 118px),
+    repeating-linear-gradient(90deg, transparent 0 78px, rgba(120,100,76,.08) 78px 80px);
+  background-size: 100% 100%, 80px calc(100% - 118px);
+  background-position: top, bottom; background-repeat: no-repeat, repeat-x; }
+.skirt { position: absolute; left: 0; right: 0; top: 115px; height: 6px; background: #cdbc9c; border-top: 3px solid var(--ink); }
+
+/* door */
+.door-frame { position: absolute; left: 10px; top: 44px; width: 66px; height: 108px; }
+.door-frame .hole { position: absolute; inset: 0; background: #3b352e;
+  border: 3px solid var(--ink); border-radius: 8px 8px 0 0; }
+.door-frame .hole::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 26px;
+  background: linear-gradient(180deg, #6f6250 0 3px, transparent 3px); }
+.door-leaf { position: absolute; inset: 0;
+  background: linear-gradient(90deg, #6d4b28 0 3px, #a5713a 3px 30px, rgba(0,0,0,.14) 30px 33px, #a5713a 33px 57px, #6d4b28 57px 60px);
+  border: 3px solid var(--ink); border-radius: 8px 8px 0 0;
+  transform-origin: left center; transition: transform .55s ease; }
+.door-leaf::before { content: ""; position: absolute; left: 9px; top: 18px; width: 38px; height: 38px;
+  border: 2px dashed rgba(60,40,20,.5); border-radius: 3px; }
+.door-leaf::after { content: ""; position: absolute; right: 5px; top: 52px; width: 7px; height: 7px;
+  background: var(--ink); border-radius: 50%; }
+.door-frame.open .door-leaf { transform: rotateY(-72deg); }  /* opens into view */
+.door-frame .sign { position: absolute; top: -26px; left: -12px; right: -140px; display: flex; align-items: center;
+  gap: 5px; font-size: .62rem; font-weight: 700; color: rgba(43,43,43,.65); letter-spacing: 1px; text-transform: uppercase; }
+.door-frame .led { width: 8px; height: 8px; border-radius: 50%; border: 2px solid var(--ink); background: #ddd;
+  transition: background .4s, box-shadow .4s; }
+.door-frame.open .led { background: var(--busy); box-shadow: 0 0 8px rgba(245,166,35,.9); }
+
+/* wall props */
+.stage-board { position: absolute; left: 110px; top: 22px; width: 176px; height: 84px; background: #fbfefb;
+  border: 3px solid var(--ink); border-radius: 4px; padding: 5px 8px; }
+.stage-board::after { content: ""; position: absolute; left: 14%; right: 14%; bottom: -8px; height: 5px;
+  background: var(--ink); border-radius: 2px; }
+.stage-board h4 { margin: 0 0 4px; font-size: .6rem; letter-spacing: 1px; color: #33502f; }
+.stage-board ul { margin: 0; padding-left: 12px; overflow: hidden; max-height: 52px; list-style: square; }
+.stage-board li { font-size: .58rem; color: #33502f; line-height: 1.3; }
+.stage-board.pop { animation: boardpop .45s ease; }
+@keyframes boardpop { from { scale: .94; } }
+.wall-clock { position: absolute; left: 312px; top: 30px; width: 44px; height: 44px; background: #fff;
+  border: 3px solid var(--ink); border-radius: 50%; }
+.wall-clock::before, .wall-clock::after { content: ""; position: absolute; left: 50%; bottom: 50%; width: 3px;
+  border-radius: 2px; background: var(--ink); transform-origin: bottom center; }
+.wall-clock::before { height: 10px; transform: translateX(-50%) rotate(40deg); }
+.wall-clock i { position: absolute; left: 50%; bottom: 50%; width: 2.5px; height: 15px; border-radius: 2px;
+  background: var(--ink); transform-origin: bottom center; animation: clockspin 60s linear infinite; }
+.wall-clock::after { content: none; }
+@keyframes clockspin { to { rotate: 360deg; } }
+.window { position: absolute; right: 190px; top: 22px; width: 150px; height: 78px; overflow: hidden;
+  background: linear-gradient(180deg, #b9e2f0, #f2fbfe); border: 3px solid var(--ink); border-radius: 6px; }
+.window::before { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 3px; background: var(--ink); z-index: 2; }
+.window .sun { position: absolute; width: 19px; height: 19px; right: 18px; top: 10px; background: #ffd24a;
+  border-radius: 50%; box-shadow: 0 0 0 5px rgba(255,210,74,.4); }
+.window .cloud { position: absolute; width: 36px; height: 10px; background: #fff; border-radius: 8px;
+  left: -40px; top: 34px; animation: cloud 30s linear infinite; }
+@keyframes cloud { to { transform: translateX(250px); } }
+
+.coffee { position: absolute; right: 24px; top: 140px; }
+.stage .cor { position: absolute; right: 24px; top: 258px; font-size: .58rem; color: rgba(43,43,43,.55);
+  font-weight: 800; letter-spacing: 1.5px; }
+.coffee .ctr { position: absolute; left: 0; top: 54px; width: 92px; height: 58px; background: #b0723f;
+  border: 3px solid var(--ink); border-radius: 8px; }
+.coffee .mach { position: absolute; left: 14px; top: 16px; width: 34px; height: 40px; background: #5c5c5c;
+  border: 3px solid var(--ink); border-radius: 6px; }
+.coffee .mach::after { content: ""; position: absolute; left: 12px; top: 24px; width: 6px; height: 9px; background: #ffe6a1; }
+.coffee .steam { position: absolute; left: 24px; top: 2px; font-size: 12px; color: #8a8171; animation: steam 2.2s infinite; }
+@keyframes steam { 0% { transform: translateY(4px); opacity: 0; } 30% { opacity: .8; } 100% { transform: translateY(-8px); opacity: 0; } }
+
+.plant { position: absolute; right: 150px; bottom: 40px; width: 44px; height: 74px; }
+.plant .pot { position: absolute; bottom: 0; left: 50%; margin-left: -12px; width: 24px; height: 20px;
+  background: #c0763f; border: 3px solid var(--ink); border-radius: 3px 3px 8px 8px; }
+.plant .leaf { position: absolute; bottom: 16px; left: 50%; margin-left: -4px; width: 8px; height: 38px;
+  background: #6aa84f; border-radius: 4px; transform-origin: bottom center; }
+.plant .l1 { rotate: -24deg; animation: sway 3.6s ease-in-out infinite alternate; }
+.plant .l2 { height: 44px; }
+.plant .l3 { rotate: 24deg; animation: sway 3.6s ease-in-out -1.4s infinite alternate-reverse; }
+@keyframes sway { to { rotate: 0deg; } }
+
+/* furniture */
+.table { position: absolute; background: #c89b6d; border: 3px solid var(--ink); border-radius: 999px;
+  box-shadow: inset 0 0 0 8px #d9b289, 4px 5px 0 rgba(20,15,10,.15); }
+.table::before { content: ""; position: absolute; left: 12%; right: 38%; top: 8px; height: 8px;
+  background: rgba(255,255,255,.35); border-radius: 8px; }
+.couchBox { position: absolute; }
+.benchNote { position: absolute; font-size: .56rem; font-weight: 700; letter-spacing: .4px;
+  color: rgba(43,43,43,.45); width: 150px; text-align: center; }
+.benchNote::before { content: ""; display: block; width: 96px; height: 10px; margin: 0 auto 2px;
+  background: #a5713a; border: 3px solid var(--ink); border-radius: 5px; }
+
+/* ================================================================ ACTORS */
+.actor { position: absolute; left: 0; top: 0; width: 76px; height: 118px; }
+.actor svg { display: block; overflow: visible; transform-origin: 50% 100%; }
+.actor.faceL svg { scale: -1 1; }              /* flip whole body to walk left */
+.actor.faceUp .eyes, .actor.faceUp .mouth { opacity: 0; }  /* seen from behind */
+.actor.faceUp .hairback { opacity: 1; }
+.hairback { opacity: 0; }
+.actor .bub { position: absolute; bottom: 74%; left: 50%; transform: translateX(-50%);
+  background: #fff; border: 2px solid var(--ink); border-radius: 10px; padding: 3px 7px;
+  font-size: .64rem; width: max-content; max-width: 170px; line-height: 1.25; white-space: pre-wrap;
+  box-shadow: 2px 2px 0 rgba(43,43,43,.15); opacity: 1; transition: opacity .6s; pointer-events: none; }
+.actor .bub.big { font-size: .72rem; max-width: 240px; background: #fff8e6; }
+.actor .bub::before { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+  border: 5px solid transparent; border-top-color: var(--ink); }
+.actor .bub.fade { opacity: 0; }
+.actor .tag { position: absolute; top: -2px; left: 50%; transform: translateX(-50%);
+  font-size: 9.5px; font-weight: 800; color: #fff; background: var(--tint, #b0a891);
+  border: 2px solid var(--ink); border-radius: 8px; padding: 1px 7px 0; white-space: nowrap; pointer-events: none; }
+.actor .subtag { position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+  font-size: 8px; color: #5d5546; white-space: nowrap; max-width: 150px; overflow: hidden;
+  text-overflow: ellipsis; background: rgba(255,253,248,.8); border-radius: 6px; padding: 0 4px; pointer-events: none; }
+.actor.gone { transition: opacity .4s; opacity: 0; }
+.actor.dim { opacity: .22; }
+.actor:focus, .actor.focus { z-index: 210 !important; }
+
+/* —— walk cycle (classes toggled per frame) —— */
+.actor.moving .legL { animation: step .5s ease-in-out infinite; }
+.actor.moving .legR { animation: step .5s ease-in-out -0.25s infinite; }
+.actor.moving .armL { animation: swing .5s ease-in-out -0.25s infinite; }
+.actor.moving .armR { animation: swing .5s ease-in-out infinite; }
+.actor.moving .bob { animation: bob .5s ease-in-out infinite; }
+@keyframes step { 0%,100% { translate: -3px 0; } 50% { translate: 3px 2px; } }
+@keyframes swing { 0%,100% { rotate: 14deg; } 50% { rotate: -14deg; } }
+@keyframes bob { 0%,100% { translate: 0 0; } 50% { translate: 0 -1.5px; } }
+.legL, .legR { transform-box: fill-box; transform-origin: 50% 0%; }
+.armL, .armR, .headg { transform-box: fill-box; transform-origin: 50% 30%; }
+
+/* sitting at a desk/chair: tuck the legs up under the torso */
+.actor.seated .legleg { animation: none; scale: 1 .4; translate: 0 9px; }
+/* typist: small arm tap + head nod */
+.actor.typing .armR { animation: tap .26s ease-in-out infinite; }
+.actor.typing .headg { animation: nod .8s ease-in-out infinite; }
+@keyframes tap { 50% { translate: -1px 2px; } }
+@keyframes nod { 50% { rotate: 3deg; } }
+/* hammering (tool grinding) : big wind-up swings */
+.actor.hammering .armR { animation: hammer .6s ease-in-out infinite; }
+@keyframes hammer { 0%,100% { rotate: 0deg; } 35% { rotate: -60deg; } 55% { rotate: -12deg; } }
+/* thinker: slow head tilt */
+.actor.gazing .headg { animation: think 2.6s ease-in-out infinite; }
+@keyframes think { 50% { rotate: -6deg; translate: 1px 0; } }
+/* sleeping z's + closed eyes */
+.actor.zzz-on .eyes { opacity: 0; }
+.actor.zzz-on .headg { animation: napnod 3.2s ease-in-out infinite alternate; }
+@keyframes napnod { to { rotate: 7deg; translate: 2px 2px; } }
+.zz { position: absolute; top: -2px; right: 4px; color: #7a7264; font-weight: bold; display: none; }
+.actor.zzz-on .zz { display: block; animation: zfloat 2.4s ease-out infinite; }
+.actor.zzz-on .z2 { top: -8px; animation-delay: .9s; }
+@keyframes zfloat { 0% { opacity: 0; translate: 0 4px; } 25% { opacity: 1; } 100% { opacity: 0; translate: 9px -22px; } }
+
+@media (max-width: 900px) {
+  .stage { height: 520px; }
+  .whiteboard { grid-template-columns: 1fr; }
+  .wb-half:first-child { border-right: 0; padding-right: 0; }
+}
